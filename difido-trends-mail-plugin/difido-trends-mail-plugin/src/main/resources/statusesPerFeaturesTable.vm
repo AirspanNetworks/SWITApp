@@ -1,0 +1,53 @@
+<h3>Summary Results:</h3>
+<table>
+<tr>
+	<th>Statistic</th>
+	<th>Total</th>
+	<th>Pass</th>
+	<th>Fail</th>
+	<th>Duration</th>
+</tr>
+
+<tr>
+	<td><b>Total</b></td>
+	#set($all = $allTests.pass + $allTests.warning + $allTests.fail)
+	<td><b>$all</b></td>
+	
+	#set($pass = $allTests.pass + $allTests.warning)
+	#if($pass > 0)	
+		<td bgcolor="#81C784"><b>$pass</b></td>
+	#else
+		<td><b>$pass</b></td>
+	#end
+	
+	#if($allTests.fail > 0)
+		<td bgcolor="#E57373"><b>$allTests.fail</b></td>
+	#else
+		<td><b>$allTests.fail</b></td>
+	#end
+	
+	<td><b>$allTests.duration</b></td>
+</tr>
+
+#foreach ($entry in $statusPerFeatureMap.entrySet())
+<tr>
+	<td>&nbsp $entry.key</td>
+	#set($all = $entry.value.pass + $entry.value.warning + $entry.value.fail)
+	<td>$all</td>
+	#set($entrypass = $entry.value.pass + $entry.value.warning)
+	#if($entrypass > 0)
+		<td bgcolor="#81C784">$entrypass</td>
+	#else
+		<td>$entrypass</td>
+	#end
+	
+	#if($entry.value.fail > 0)
+		<td bgcolor="#E57373">$entry.value.fail</td>
+	#else
+		<td>$entry.value.fail</td>
+	#end
+	
+	<td>$entry.value.duration</td>
+</tr>
+#end
+</table>

@@ -1,0 +1,7 @@
+
+<h3>Graphs</h3>
+#foreach ($graph in $graphs.entrySet())
+	<a href=$graph.key target="_blank">
+	<img src=$graph.key width=400 height=400></a>
+#end
+<br>

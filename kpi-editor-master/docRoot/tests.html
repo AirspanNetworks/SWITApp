@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="description" content="Allows editing the issue type of each test case">
+	<meta name="author" content="Itai Agmon">
+	<title>Test Issue Editor</title>
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/buttons.dataTables.min.css" rel="stylesheet">
+	<link href="css/jquery.dataTables.min.css" rel="stylesheet">
+</head>
+
+<body>
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="index.html">KPI Editor</a>
+			</div>
+			<ul id="navbar" class="nav navbar-nav">
+				<li><a href="index.html">Executions</a></li>
+				<li class="active"><a href="#">Tests</a></li>
+				<li><a href="aggs.html">Dashboard</a></li>
+			</ul>
+		</div>
+	</nav>
+
+	<div class="container-fluid">
+		<div class="col-md-12 main">
+			<br><br><br>
+		</div>
+		<div class="col-md-12 main">
+			<h2 id="title">Tests Table</h2>
+			<hr>
+			<table id="table" class="display">
+			</table>
+			<hr>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="js/jquery-1.12.0.min.js"></script>
+	<script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" src="js/dataTables.buttons.min.js"></script>
+	<script type="text/javascript" src="js/buttons.html5.min.js"></script>
+	<script type="text/javascript" src="js/pdfmake.min.js"></script>
+	<script type="text/javascript" src="js/vfs_fonts.js"></script>
+	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script>
+		function getParameterByName(name) {
+			var url = window.location.href;
+			name = name.replace(/[\[\]]/g, "\\$&");
+			var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+				results = regex.exec(url);
+			if (!results) return null;
+			if (!results[2]) return '';
+			return decodeURIComponent(results[2].replace(/\+/g, " "));
+		}
+
+		function updateMultiple(table) {
+			console.log("Not implemented yet");
+		}
+
+		function issueChanged(executionId, uid, value) {
+			$.ajax({
+				url: '/api/execution/' + executionId + '/test/' + uid + "?issue=" + value,
+				type: 'PUT',
+				error: function (xhr) {
+					reject("Failed to get elastic fields");
+				}
+			}).done(function (tests) {
+				console.log("Update was successful")
+			});
+		}
+
+		function maketable(json) {
+			var columns = []
+			for (var i = 0; i < json.headers.length; i++) {
+				columns[i] = {
+					'title': json.headers[i],
+					'data': json.headers[i]
+				}
+			}
+			var table = $('#table')
+				.DataTable(
+				{
+					dom: 'lBfrtip',
+					buttons: [
+						{
+							text: 'Multiple Update',
+							action: function (e, dt, node, config) {
+								updateMultiple(table);
+							}
+						},
+						'copyHtml5', 'csvHtml5', 'pdfHtml5'],
+					columns: columns,
+					data: json.data,
+					aaSorting: [],
+					deferRender: true,
+					sPaginationType: "full_numbers",
+					iDisplayLength: 25,
+					columnDefs: [
+						{
+							// Alows missing values. Important for execution properties in which not all of the execution must have all the properties.
+							targets: "_all",
+							sDefaultContent: ""
+						},
+						{
+							// The description column will be rendered as link using the value in the link column
+							targets: 6,
+							className: "unselectable",
+							"render": function (data, type, row) {
+								options = ["", "SW", "Auto", "Setup"];
+								var html = '<select onchange="issueChanged(\'' + row.Execution + '\',\'' + row.Uid + '\',this.value)">';
+								for (var i in options) {
+									if (data === options[i]) {
+										html += '<option selected="selected">'
+									} else {
+										html += '<option>'
+									}
+									html += options[i] + '</option>';
+								}
+								html += '</select>';
+								return html;
+							}
+						},
+					]
+				});
+			// $('#table tbody').on( 'click', 'tr', function () {
+			// 	if ($(this).hasClass("unselectable")) {
+			// 		return;
+			// 	}
+			// 	$(this).toggleClass('selected');
+			// } );
+
+		}
+
+
+		function getTests(executionId) {
+			return new Promise(function (fulfill, reject) {
+				$.ajax({
+					url: '/api/execution/' + executionId + '/test',
+					type: 'GET',
+					error: function (xhr) {
+						reject("Failed to get elastic fields");
+					}
+				}).done(function (tests) {
+					fulfill(tests);
+				});
+
+			});
+
+		}
+
+		$(document).ready(function () {
+			executionId = getParameterByName("id");
+			getTests(executionId).then(function (tests) {
+				maketable(tests);
+			});
+
+		});
+	</script
+    </body>
+
+
+</html>

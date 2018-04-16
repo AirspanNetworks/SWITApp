@@ -1,0 +1,103 @@
+<h3>Tests:</h3>
+
+<table>
+	<tr>
+		<th>Test Name</th>
+		<th>Status</th>
+		<th>DUT</th>
+		<th>Duration</th>
+		<th>Fail Reason</th>
+	</tr>
+
+#foreach ($testsAndEnbs in $testsEnbsMap.entrySet())
+	#foreach($test in $testsAndEnbs.key)
+		#if ($test.status == "success")
+			#set($status ="success")
+			#set($color = "#81C784")
+		#elseif ($test.status == "failure" || $test.status == "error")
+			#set($status = $test.status)
+			#set($color = "#E57373")
+		#elseif ($test.status == "warning")
+			#set($status ="success")
+			#set($color = "#81C784")
+		#end
+		<tr>
+		#set( $name = $test.name.replace("_", " ") )
+		<td><a href="$test.url">$name</a></td>
+		<td bgcolor="$color">$StringUtils.capitalize($status)</td>
+		<td>
+			#foreach ($enb in $testsAndEnbs.value)
+				$enb#if( $velocityHasNext ), #end
+			#end
+		</td>
+		
+		#set($hours = ($test.duration / (60 * 60 * 1000)))
+		#set($msRemaining = ($test.duration - ($hours* 60 * 60 * 1000)))
+		#set($minutes = ($msRemaining / (60 * 1000)))
+		#set($msRemaining = ($msRemaining - ($minutes* 60 * 1000)))
+		#set($seconds = ($msRemaining / 1000) % 60)
+		
+		#if($hours <= 9)
+			#set($hours = '0' + $hours)
+		#end
+		
+		#if($minutes <= 9)
+			#set($minutes = '0' + $minutes)
+		#end
+		
+		#if($seconds <= 9)
+			#set($seconds = '0' + $seconds)
+		#end
+		
+		<td>$hours:$minutes:$seconds</td>
+		
+		<td>
+		#if($test.status == "failure" || $test.status == "error")
+			#foreach ($entry in $test.properties.entrySet())
+				#if($entry.key == "failureReason")
+					$entry.value<br>
+				#end
+			#end
+			
+			#foreach ($entry in $test.properties.entrySet())
+				#if($entry.key.contains("CoreFiles") && $entry.value.equals("$entry.value"))
+					#set($nodesList = $entry.value.split(";"))
+					#foreach ($node in $nodesList)
+						#set($splits = $node.split(","))
+						#if($splits.size() >= 3)
+							Core Files $splits.get(0): <a href="$splits.get(2)">$splits.get(1)</a><br>
+						#end
+					#end
+				#elseif($entry.key.contains("CoreFilePath_"))
+					#set($keySplits = $entry.key.split("_"))
+					#if($keySplits.size() >= 3)
+						Core Files $keySplits.get(1): <a href="$entry.value">$keySplits.get(2)</a><br>
+					#end
+				#end
+			#end
+			
+			#foreach ($entry in $test.properties.entrySet())
+				#if($entry.key.contains("Unexpected Reboots"))
+					#set($keySplits = $entry.key.split("_"))
+					#if($keySplits.size() >= 4)
+						Unexpected Reboots: $entry.value<br>
+					#end
+				#elseif($entry.key.contains("LogCounter") && $entry.value.contains("Unexpected Reboots"))
+					#set($values = $entry.value.split(";"))
+					#foreach($value in $values)
+						#if($value.contains("Unexpected Reboots"))
+							#set($splits = $value.split(","))
+							#if($splits.size() >= 4)
+								Unexpected Reboots: $splits.get(3)<br>
+							#end
+						#end
+					#end
+				#end
+			#end
+		#end
+		</td>
+		</tr>
+	#end
+#end
+
+</table>

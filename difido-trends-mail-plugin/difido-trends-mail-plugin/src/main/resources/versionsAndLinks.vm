@@ -1,0 +1,87 @@
+<style>
+div.square {
+    border: 1px solid black;
+    padding: 3px;
+}
+div.screen{
+	max-width: 100%;
+    margin: 3px;
+}
+table {
+    border-collapse: collapse;
+ 	font-size: 1.5vw;
+ 	width: 100%;
+}
+td, th {
+    border: 1px solid black;
+	text-align: left;
+    padding: 3px;
+}
+th {
+    background-color: #7FBFFF;
+    color: white;
+}
+</style>
+<div class="screen">
+<h3>Versions Details:</h3>
+<table>
+	<tr>
+		#if (($versionPath.equals("$versionPath")) && (!$versionPath.equals("")))
+			<th>DUT Path</th>
+		#end
+		
+		<th>Report Path</th>
+		
+		#if ($version.equals("$version"))
+			<th>Automation</th>
+		#end
+		
+		<th>Date</th>
+		<th>Time</th>
+	</tr>
+	
+	<tr>
+		#if (($versionPath.equals("$versionPath")) && (!$versionPath.equals("")))
+			#set($versionPathSplits = $versionPath.split("\\"))
+			#set($splitsSize = $versionPathSplits.size())
+			#set($index = $splitsSize - 2)
+			<td><a href="$versionPath">$versionPathSplits.get($index)</a></td>
+		#end
+		<td><a href="$link" target="_blank">$scenarioName</a></td>
+		#if ($version.equals("$version"))
+			<td>$version</td>
+		#end
+		
+		<td>$date</td>
+		<td>$time</td>
+	</tr>
+</table>
+
+<h3>Run Details:</h3>
+<table>
+	<tr>
+		<th>DUT Name</th>
+		<th>HW Type</th>
+		<th>Via Donor</th>
+		<th>PNP</th>
+		<th>IPSec</th>
+		<th>IP</th>
+		<th>CA</th>
+		<th>Active Cells</th>
+		<th>Band</th>
+		<th>Duplex</th>
+		<th>BW</th>		
+	</tr>
+	
+		#foreach ($entry in $devicesDetails.entrySet())
+			<tr>
+			<td>$entry.key</td>
+			#foreach ($entryMap in $entry.value.entrySet())
+				<td>$entryMap.value</td>
+			#end
+			</tr>
+		#end
+</table>
+
+<br>
+<hr color="#182882" size="3">

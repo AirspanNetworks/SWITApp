@@ -1,0 +1,41 @@
+
+<h3>Errors / Warnings Summary:</h3>
+<table>
+<tr>
+	<th>Line expression</th>
+	<th>Event Type</th>
+	#foreach($enb in $enbs)
+		#if($enb.contains("("))
+			#set($splits = $enb.split("\("))
+			#set($splits = $splits.get(1).split("\)"))
+			<th>$splits.get(0)</th>
+		#else
+			<th>$enb</th>
+		#end
+	#end
+</tr>
+
+	#foreach ($mapSeverity in $redMaps.entrySet())
+		#foreach ($mapLineExpression in $mapSeverity.value.entrySet())
+			<tr bgcolor="#E57373">
+				<td>$mapLineExpression.key</td>
+				<td>$mapSeverity.key</td>
+				#foreach ($mapEnb in $mapLineExpression.value.entrySet())
+				<td>$mapEnb.value</td>
+				#end
+			</tr>
+		#end
+	#end
+	
+	#foreach ($mapSeverity in $whiteMaps.entrySet())
+		#foreach ($mapLineExpression in $mapSeverity.value.entrySet())
+			<tr>
+				<td>$mapLineExpression.key</td>
+				<td>$mapSeverity.key</td>
+				#foreach ($mapEnb in $mapLineExpression.value.entrySet())
+				<td>$mapEnb.value</td>
+				#end
+			</tr>
+		#end
+	#end
+</table>

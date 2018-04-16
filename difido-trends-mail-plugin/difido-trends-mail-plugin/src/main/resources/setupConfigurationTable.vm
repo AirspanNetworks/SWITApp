@@ -1,0 +1,19 @@
+<br>
+<hr color="#182882" size="3">
+
+<h3>Setup Configuration:</h3>
+	<table>
+		<tr>
+		<th colspan="2">$title</th>
+		</tr>
+		#foreach ($entry in $setupConfiguration.entrySet())
+			#if ($entry.value.equals("$entry.value"))
+				<tr>
+	  	 		<td><b>$entry.key</b></td>
+	 			<td>$entry.value</td>
+			 	</tr>
+		 	#end
+		#end
+	</table>
+<br>
+<hr>

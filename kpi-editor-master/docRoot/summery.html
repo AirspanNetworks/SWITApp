@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="View of all the relvant executions">
+        <meta name="author" content="Hen Goldburd">
+        <title>Execution List</title>
+        <link href="css/status_colors.css" rel="stylesheet">
+        <link href="css/bootstrap.min.css" rel="stylesheet">      
+	    <link href="css/buttons.dataTables.min.css" rel="stylesheet">
+	    <link href="css/jquery.dataTables.min.css" rel="stylesheet">
+    </head>
+    <body>
+        	<select id="sel" onchange="fillTable()">
+        		<option value="15.10">15.10</option>
+  				<option value="15.50">15.50</option>
+        	
+        	 </select>
+        	
+        	
+        	<div class="container-fluid">
+		        <div class="col-md-12 main">
+			    <h2 id="title">Tests Table</h2>
+			    <hr>
+			    <table id="table" class="display">
+			    </table>
+			<hr>
+		</div>
+	</div>
+       	<script type="text/javascript" src="js/jquery-1.12.0.min.js"></script>
+	    <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
+		<script type="text/javascript" src="js/dataTables.buttons.min.js"></script>
+		<script type="text/javascript" src="js/buttons.html5.min.js"></script>
+		<script type="text/javascript" src="js/pdfmake.min.js"></script>
+		<script type="text/javascript" src="js/vfs_fonts.js"></script>
+	    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script>
+		function makeCombo(json) {
+			var dataArr = json.data;
+			for (elem in dataArr) {
+				var element = dataArr[elem].replace(/"/g, "");
+				 $('#sel').append($('<option/>').attr("value", element).text(element));
+				}
+		  
+		     }
+		function maketable(json) {
+			var columns = []
+			for (var i = 0; i < json.headers.length; i++) {
+				columns[i] = {
+					'title' : json.headers[i],
+					'data' : json.headers[i]
+				}
+			}
+            var table = $('#table')
+					.DataTable(
+							{
+							
+							
+							
+								dom : 'lBfrtip',
+								buttons : ['copyHtml5', 'csvHtml5', 'pdfHtml5' ],
+								columns : columns,
+								data : json.data,
+								aaSorting : [],
+								deferRender : true,
+								sPaginationType : "full_numbers",
+								iDisplayLength : 12,
+								columnDefs : [
+												{
+													// Alows missing values. Important for execution properties in which not all of the execution must have all the properties.
+													targets : "_all",
+													sDefaultContent : ""
+												}
+                                            ],
+                                createdRow: function ( row, data, index ) {
+                                var arr = Object.values(data)
+        							for (i = 1; i < arr.length; i++) { 
+        								var ratesArr = arr[i].split("/")
+        								if (ratesArr.length != 2)
+        									continue;
+        								var fail = parseInt(ratesArr[0])
+        								var pass = parseInt(ratesArr[1])
+    									if ( fail <  pass) {
+                							$('td', row).eq(i).addClass('s_failure_back');
+            							}
+            							else{
+            								$('td', row).eq(i).addClass('s_success_back');
+            							}
+									}
+								}
+                                         
+                      
+    				} );
+					//$('#table tbody').on( 'click', 'tr', function () {
+					//	var execution = table.row(this).data()["Execution"];
+					//	window.open("/tests.html?id=" + execution,"_self")
+    				//} );
+
+		     }
+
+			 function getExecutions() {
+                return new Promise(function (fulfill, reject) {
+                    $.ajax({
+                        url: '/api/release/',
+                        type: 'GET',
+                        error: function (xhr) {
+                            reject("Failed to get elastic fields");
+                        }
+                    }).done(function (executions) {                        
+                        fulfill(executions);
+                    });
+
+                });
+
+            }
+			 function fillTable(){
+				 getOverview().then(function(overview){
+					 maketable(overview);
+	                });
+			 }
+			 
+			 function getOverview() {
+				 var rel = document.getElementById("sel").value;
+	                return new Promise(function (fulfill, reject) {
+	                    $.ajax({
+	                        url: '/api/release/'+rel+'/test',
+	                        type: 'GET',
+	                        error: function (xhr) {
+	                            reject("Failed to get elastic fields");
+	                        }
+	                    }).done(function (overview) {                        
+	                        fulfill(overview);
+	                    });
+
+	                });
+
+	            }
+			 
+
+           // $(document).ready(function() {			
+		//		getExecutions().then(function(executions){
+         //           makeCombo(executions);
+          //      });
+		   // });
+        </script>
+    </body>
+
+
+</html>
+
+
+

@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-Description: Restcomm Diameter
+Implementation-Title: org.mobicents.diameter.testsuite:testsuite-local
+Bundle-License: http://www.gnu.org/licenses/agpl.html
+Bundle-SymbolicName: org.mobicents.diameter.testsuite.local
+Implementation-Version: 1.7.0-SNAPSHOT
+Built-By: hgoldburd
+Bundle-ManifestVersion: 2
+Bnd-LastModified: 1504448691761
+Implementation-Vendor-Id: TeleStax, Inc.
+Tool: Bnd-1.15.0
+Bundle-Version: 1.7.0.SNAPSHOT
+Bundle-Name: Restcomm :: Diameter Testsuite :: testsuite-local
+Created-By: Apache Maven Bundle Plugin
+Implementation-URL: http://www.restcomm.org
+Build-Jdk: 1.8.0_131
+

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<diamConfig>
+	<CBR1>
+		<mediaComponentDescription>
+			<mediaComponentNumber>1</mediaComponentNumber>
+			<mediaSubComponent>
+				<flowNumber>1</flowNumber>
+				<flowDescriptionOut>permit out ip from 0.0.0.0 to 0.0.0.0</flowDescriptionOut>
+				<flowDescriptionIn>permit in ip from 0.0.0.0 to 0.0.0.0</flowDescriptionIn>
+			</mediaSubComponent>
+			<mediaSubComponent>
+				<flowNumber>1</flowNumber>
+				<flowDescriptionOut>permit out ip from 0.0.0.0 to 0.0.0.0</flowDescriptionOut>
+				<flowDescriptionIn>permit in ip from 0.0.0.0 to 0.0.0.0</flowDescriptionIn>
+				<flowUsag>1</flowUsag>
+			</mediaSubComponent>
+			<mediaType>4</mediaType>
+			<maxRequestedUl>41984</maxRequestedUl>
+			<maxRequestedDl>65536</maxRequestedDl>
+			<flowStatus>2</flowStatus>
+			<codecDataUl>uplink</codecDataUl>
+			<codecDataDl>downlink</codecDataDl>
+		</mediaComponentDescription>
+		<subscriptionIdType>1</subscriptionIdType>
+	</CBR1>
+	<CBR2>
+		<mediaComponentDescription>
+			<mediaComponentNumber>1</mediaComponentNumber>
+			<mediaSubComponent>
+				<flowNumber>1</flowNumber>
+				<flowDescriptionOut>permit out ip from 0.0.0.0 to 0.0.0.0</flowDescriptionOut>
+				<flowDescriptionIn>permit in ip from 0.0.0.0 to 0.0.0.0</flowDescriptionIn>
+			</mediaSubComponent>
+			<mediaSubComponent>
+				<flowNumber>1</flowNumber>
+				<flowDescriptionOut>permit out ip from 0.0.0.0 to 0.0.0.0</flowDescriptionOut>
+				<flowDescriptionIn>permit in ip from 0.0.0.0 to 0.0.0.0</flowDescriptionIn>
+				<flowUsag>1</flowUsag>
+			</mediaSubComponent>
+			<mediaType>0</mediaType>
+			<maxRequestedUl>41984</maxRequestedUl>
+			<maxRequestedDl>65536</maxRequestedDl>
+			<flowStatus>2</flowStatus>
+			<codecDataUl>uplink</codecDataUl>
+			<codecDataDl>downlink</codecDataDl>
+		</mediaComponentDescription>
+		<subscriptionIdType>1</subscriptionIdType>
+	</CBR2>
+	<MBR>
+		<mediaComponentDescription>
+			<mediaComponentNumber>1</mediaComponentNumber>
+			<mediaSubComponent>
+				<flowNumber>1</flowNumber>
+				<flowDescriptionOut>permit out ip from 0.0.0.0 to 0.0.0.0</flowDescriptionOut>
+				<flowDescriptionIn>permit in ip from 0.0.0.0 to 0.0.0.0</flowDescriptionIn>
+			</mediaSubComponent>
+			<mediaSubComponent>
+				<flowNumber>1</flowNumber>
+				<flowDescriptionOut>permit out ip from 0.0.0.0 to 0.0.0.0</flowDescriptionOut>
+				<flowDescriptionIn>permit in ip from 0.0.0.0 to 0.0.0.0</flowDescriptionIn>
+				<flowUsag>1</flowUsag>
+			</mediaSubComponent>
+			<mediaType>0</mediaType>
+			<maxRequestedUl>41984</maxRequestedUl>
+			<maxRequestedDl>65536</maxRequestedDl>
+			<flowStatus>2</flowStatus>
+			<codecDataUl>uplink</codecDataUl>
+			<codecDataDl>downlink</codecDataDl>
+		</mediaComponentDescription>
+		<subscriptionIdType>1</subscriptionIdType>
+	</MBR>
+</diamConfig>

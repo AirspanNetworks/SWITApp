@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-Description: Restcomm Diameter
+Implementation-Title: org.mobicents.diameter:diameter-core-docs-source
+ s
+Bundle-License: http://www.gnu.org/licenses/agpl.html
+Bundle-SymbolicName: org.mobicents.diameter.core-docs-sources
+Implementation-Version: 1.7.0-SNAPSHOT
+Built-By: hgoldburd
+Bundle-ManifestVersion: 2
+Bnd-LastModified: 1502037350174
+Implementation-Vendor-Id: TeleStax, Inc.
+Tool: Bnd-1.15.0
+Bundle-Version: 1.7.0.SNAPSHOT
+Bundle-Name: Restcomm :: Diameter Documentation :: diameter-core-docs-
+ sources
+Created-By: Apache Maven Bundle Plugin
+Implementation-URL: http://www.restcomm.org
+Build-Jdk: 1.8.0_131
+

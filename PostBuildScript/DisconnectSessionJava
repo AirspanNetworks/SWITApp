@@ -1,0 +1,108 @@
+package testsNG.Actions.Utils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+public class DisconnectSession {
+	static String machineName = "" ;
+	static String localMachineSessionName;
+	
+	public static void main(String[] args) {
+		// steps:
+		init();
+		// check for sessions generally
+		List<String> sessions = getAllSessions();
+		if(sessions != null){
+			System.out.println("there are some Sessions in Response");
+			System.out.println(" ");
+			
+			localMachineSessionName = getLocalMachineSessionName(sessions,machineName);
+			if(localMachineSessionName != null){
+				System.out.println("session found, trying to kill it");
+				killSession(localMachineSessionName);
+			}
+		}
+	}
+
+	private static void killSession(String sessionToKill) {
+		String sessionWithoutSpaces = sessionToKill.replaceAll(" ", "%20");
+		OkHttpClient client = new OkHttpClient();
+
+		Request request = new Request.Builder()
+		  .url("http://192.168.58.201/stcapi/sessions/"+sessionWithoutSpaces)
+		  .delete(null)
+		  .addHeader("x-stc-api-session", sessionToKill)
+		  .addHeader("cache-control", "no-cache")
+		  .addHeader("postman-token", "f01698b0-36ea-2a71-5a53-d6ca6aadca73")
+		  .build();
+
+		try {
+			Response response = client.newCall(request).execute();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	private static String getLocalMachineSessionName(List<String> sessions, String machineName) {
+		for(String string : sessions){
+			String[] usersSessions = string.split(",");
+			for(String str  : usersSessions){
+				System.out.println(str);
+				String cleanStr = str.replaceAll("[^a-zA-Z0-9\\-\\ ]", "");
+				if(cleanStr.equals(machineName)){
+					return cleanStr;
+				}
+			}
+		}
+		return null;
+	}
+
+	private static void init() {
+		try{
+		machineName = InetAddress.getLocalHost().getHostName()+ " - admin";
+		System.out.println("Machine Name: "+machineName);
+		}catch(Exception e){
+			e.printStackTrace();
+			System.out.println("canot init parameters");
+		}
+	}
+
+	private static List<String> getAllSessions() {
+		OkHttpClient client = new OkHttpClient();
+		Request request = new Request.Builder()
+				  .url("http://192.168.58.201/stcapi/sessions/")
+				  .get()
+				  .addHeader("cache-control", "no-cache")
+				  .addHeader("postman-token", "0c958bfa-c789-bbe1-2f52-b2f27a2f0da5")
+				  .build();
+		Response response;
+		try {
+			response = client.newCall(request).execute();
+
+			if (response != null) {
+				BufferedReader rd = new BufferedReader(new InputStreamReader(response.body().byteStream()));
+				ArrayList<String> lines = new ArrayList<String>();
+				String line;
+				while ((line = rd.readLine()) != null) {
+					lines.add(line);
+				}
+				return lines;
+			} else {
+				System.out.println("response is empty!");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Exception while method getAllSessions");
+		}
+		return null;
+	}
+}

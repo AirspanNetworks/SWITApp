@@ -1,0 +1,41 @@
+#if(($current.targetVersion.equals("$current.targetVersion")) && ($previous.targetVersion.equals("$previous.targetVersion")))
+	<h3>$current.targetVersion vs $previous.targetVersion: </h3>
+#else
+	<h3>Comparison between executions $current.id and $previous.id: </h3>
+#end
+
+#set($failToPass = $comparison.failToPass + $comparison.failToWarning)
+#if($failToPass > 0)
+	#set($failToPassColor = "#81C784")
+#elseif($failToPass < 0)
+	#set($failToPassColor = "#E57373")
+#else
+	#set($failToPassColor = "white")
+#end
+
+#set($passToFail = $comparison.passToFail + $comparison.warningToFail)
+#if($passToFail > 0)
+	#set($passToFailColor = "#E57373")
+#elseif($passToFail < 0)
+	#set($passToFailColor = "#81C784")
+#else
+	#set($passToFailColor = "white")
+#end
+
+<table>
+
+	<tr>
+		<th>Fail to Pass</th>
+		<th>Pass to Fail</th>
+		<th>New Tests</th>
+		<th>Deleted Tests</th>
+	</tr>
+
+	<tr>
+		<td bgcolor="$failToPassColor">$failToPass</td>
+		<td bgcolor="$passToFailColor">$passToFail</td>
+		<td>$comparison.newTests</td>
+		<td>$comparison.deleteTests</td>
+	</tr>
+
+</table>

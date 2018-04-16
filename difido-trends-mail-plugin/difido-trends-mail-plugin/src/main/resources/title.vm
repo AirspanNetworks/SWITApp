@@ -1,0 +1,9 @@
+#if ($status == "Pass")
+	#set($color = "#2F8740")
+#elseif($status == "Fail")
+	#set($color = "#E57373")
+#elseif($status == "Core Warning")
+	#set($color = "#FFCA28")
+#end
+
+<h3><big><font color="#182882">$scenarioName: $passTests/$allTests </font><font color="$color">$status</font></big></h3>
