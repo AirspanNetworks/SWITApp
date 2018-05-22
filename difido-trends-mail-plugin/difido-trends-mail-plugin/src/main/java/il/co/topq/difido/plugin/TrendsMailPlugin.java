@@ -32,6 +32,7 @@ public class TrendsMailPlugin extends DefaultMailPlugin {
 	
 	//Setup Configuration Table
 	public static final String ENB_TYPE = "EnbType";
+	public static final String RELAY_VERSION = "RelayVersions";
 	public static final String UE_TYPE = "UeType";
 	public static final String NETSPAN_VERSION = "NetspanVar";
 	public static final String SYSTEM_DEFAULTS_PROFILES = "SystemDefaultsProfiles";

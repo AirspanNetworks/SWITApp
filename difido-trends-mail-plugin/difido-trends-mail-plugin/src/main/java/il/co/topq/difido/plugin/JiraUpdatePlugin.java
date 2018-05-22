@@ -41,6 +41,7 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 	public static final String DIFIDO_LINK = "url";
 	// Setup Configuration Table
 	public static final String ENB_TYPE = "EnbType";
+	public static final String RELAY_VERSION = "RelayVersions";
 	public static final String NETSPAN_VERSION = "NetspanVar";
 
 	private static final Logger log = LoggerFactory.getLogger(JiraUpdatePlugin.class);

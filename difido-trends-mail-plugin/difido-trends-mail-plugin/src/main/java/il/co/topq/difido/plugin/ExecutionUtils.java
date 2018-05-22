@@ -52,7 +52,10 @@ public class ExecutionUtils {
 	public static Map<String, String> getSetupConfiguration(Map<String, String> scenarioProperties) {
 		log.debug("calling getSetupConfiguration method");
 		final Map<String, String> setupConfiguration = new LinkedHashMap<String, String>();
-
+		
+		if (scenarioProperties.get(RELAY_VERSION) != null) {
+			setupConfiguration.put("Relay Version", scenarioProperties.get(RELAY_VERSION));
+		}
 		if (scenarioProperties.get(UE_TYPE) != null) {
 			setupConfiguration.put("UE type", scenarioProperties.get(UE_TYPE));
 		}
