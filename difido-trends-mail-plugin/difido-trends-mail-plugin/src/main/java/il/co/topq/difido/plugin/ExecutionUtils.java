@@ -555,7 +555,9 @@ public class ExecutionUtils {
 		int successTests = metadata.getNumOfSuccessfulTests();
 		int warningTests = metadata.getNumOfTestsWithWarnings();
 		int numOfAllTests = metadata.getNumOfTests();
-		
+		log.info("successTests: " + successTests);
+		log.info("warningTests: " + warningTests);
+		log.info("numOfAllTests: " + numOfAllTests);
 		if ((successTests + warningTests) == numOfAllTests) {
 			if ((ExecutionUtils.existsTestContainsKey(tests, "CoreFilePath_")) || (ExecutionUtils.existsTestContainsKey(tests, "CoreFiles")))
 				status = "Core Warning";
