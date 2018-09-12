@@ -126,7 +126,10 @@ public class TrendsMailPlugin extends DefaultMailPlugin {
 			}
 
 			else {// execute
-				toAddresses = this.sendToAddress;
+				if(!this.sendToAddress.contains("@"))
+					toAddresses = config.readString(this.sendToAddress);
+				else
+					toAddresses = this.sendToAddress;
 			}
 			log.debug("The address(es) to send the mail are: " + toAddresses);
 		} catch (Exception e) {
