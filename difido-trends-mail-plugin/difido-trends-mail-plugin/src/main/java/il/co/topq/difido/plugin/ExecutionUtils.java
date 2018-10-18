@@ -554,16 +554,23 @@ public class ExecutionUtils {
 		String status = "";
 		int successTests = metadata.getNumOfSuccessfulTests();
 		int warningTests = metadata.getNumOfTestsWithWarnings();
+		int failTests = metadata.getNumOfFailedTests();
 		int numOfAllTests = metadata.getNumOfTests();
 		log.info("successTests: " + successTests);
+		log.info("failTests: " + failTests);
 		log.info("warningTests: " + warningTests);
 		log.info("numOfAllTests: " + numOfAllTests);
-		if ((successTests + warningTests) == numOfAllTests) {
-			if ((ExecutionUtils.existsTestContainsKey(tests, "CoreFilePath_")) || (ExecutionUtils.existsTestContainsKey(tests, "CoreFiles")))
+		if (successTests + warningTests == numOfAllTests) {
+			if ((ExecutionUtils.existsTestContainsKey(tests, "CoreFilePath_")) || (ExecutionUtils.existsTestContainsKey(tests, "CoreFiles"))){
+				log.info("Execution " + metadata.getId() + " Reported as Core Warning");
 				status = "Core Warning";
-			else
+			}
+			else{
+				log.info("Execution " + metadata.getId() + " Reported as Pass");
 				status = "Pass";
+			}
 		} else {
+			log.info("Execution " + metadata.getId() + " Reported as Fail");
 			status = "Fail";
 		}
 		return status;

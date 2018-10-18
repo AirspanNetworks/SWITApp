@@ -27,7 +27,7 @@ public class TrendsMailPlugin extends DefaultMailPlugin {
 	public static final String TARGET_VERSION = "targetVersion";
 	public static final String SEND_MAIL_FLAG = "SendMailFlag";
 	public static final String MAILING_LIST = "MailingList";
-	public static final String SECOND_MAILING_LIST = "SecondMailingList";
+	public static final String SECOND_MAILING_LIST = "SpamList";
 	public static final String START_TIME_DATE = "Date";
 	
 	//Setup Configuration Table
@@ -113,7 +113,7 @@ public class TrendsMailPlugin extends DefaultMailPlugin {
 		String toAddresses = "";
 
 		try {// We need to give time to the Elastic to index the data
-			Thread.sleep(1000);
+			Thread.sleep(5000);
 			final int executionId = getMetadata().getId();
 			final Map<String, String> scenarioProperties = ExecutionUtils.getExecutionScenarioProperties(executionId);
 			Configuration config = Configuration.getInstance(Configuration.MAIL_CONFIG_FILE_NAME);

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>il.co.topq.difido</groupId>
 	<artifactId>difido-trends-mail-plugin</artifactId>
-	<version>1.48.02</version>
+	<version>1.48.04</version>
 	<properties>
 		<internal.maven.repo>http://asil-swit:9010/repository/airspan-public/</internal.maven.repo>
 	</properties>
