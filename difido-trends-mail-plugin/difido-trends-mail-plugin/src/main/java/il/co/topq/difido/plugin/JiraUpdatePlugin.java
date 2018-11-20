@@ -1,17 +1,26 @@
 package il.co.topq.difido.plugin;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +95,7 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 	private static String RELAY_VERSION_ID = "relay_version_field_id";
 
 	private String rawEnbTypeString = null;
+	private String basicUrl = null;
 
 	public static void main(String[] args) {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -140,6 +150,9 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 		}
 		config = Configuration.getInstance(Configuration.JIRA_CONFIG_FILE_NAME);
 		jiraServer = config.readString(JIRA_SERVER_ADDRESS);
+		basicUrl = "http://" + jiraServer + ":8080/";
+		if (!updateUrl())
+			return;
 		int executionId = metadata.getId();
 		List<ElasticsearchTest> allTests;
 		List<ElasticsearchTest> sortedTests;
@@ -174,11 +187,11 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 				log.warn("test '" + test.getName() + "' duration is 0, incomplete test, not added to jira!");
 				continue;
 			}
-			/*String testKey = checkTestKeyIssueExists(test);
-			if (testKey == "") {
-				log.warn("test '" + test.getName() + "' key - " + testKey + " does not exist in jira!");
-				continue;
-			}*/
+			/*
+			 * String testKey = checkTestKeyIssueExists(test); if (testKey ==
+			 * "") { log.warn("test '" + test.getName() + "' key - " + testKey +
+			 * " does not exist in jira!"); continue; }
+			 */
 
 			res &= createJiraIssue(exeKey, test);
 		}
@@ -269,8 +282,8 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 
 		String official = ExecutionUtils.getStatus(metadata, allTests).equals("Pass") ? "Yes" : "No";
 		String relayVersion = scenarioProperties.get(RELAY_VERSION);
-		if(relayVersion == null)
-			relayVersion="";
+		if (relayVersion == null)
+			relayVersion = "";
 		String projectId = config.readString(PROJECT_ID);
 		String enodebTypeId = config.readString(ENODEB_TYPE_ID);
 		String durationId = config.readString(DURATION_ID);
@@ -294,15 +307,15 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 				+ "\"customfield_" + automationVersionId + "\": [\"" + automationVersion + "\"]," // automation_version
 				+ "\"customfield_" + enodebTypeId + "\": [ " + enbTypesString + "]," // Dut_types
 				+ "\"customfield_" + setupId + "\": [\"" + setupName + "\"]," // setup_name
-				+ "\"customfield_" + officialId + "\": {\"value\": \"" + official + "\"},"
-				+ "\"customfield_" + testEnvId + "\": [\"" + setupName + "\"]," // test_env
+				+ "\"customfield_" + officialId + "\": {\"value\": \"" + official + "\"}," + "\"customfield_"
+				+ testEnvId + "\": [\"" + setupName + "\"]," // test_env
 				+ "\"customfield_" + linkId + "\": \"" + indexLink + "\"," // link_to_test
 				+ "\"customfield_" + relayVersionId + "\": \"" + relayVersion + "\"," // relay_version
 				+ "\"customfield_" + scenarioNameid + "\": [\"" + scenarioName + "\"]," // scenario_name
 				+ "\"customfield_" + startTimeId + "\": \"" + startTime + "\"," // begin_time_2017-11-19T13:09:29.0+0200
 				+ " \"fixVersions\": [{\"name\": \"" + swVersion + "\"}],"
 				+ " \"issuetype\": {\"name\": \"Test Execution\"}}}";
-		String url = "http://" + jiraServer + ":8080/rest/api/2/issue/";
+		String url = basicUrl + "rest/api/2/issue/";
 
 		String responseText = makeRestPostRequest(bodyString, url);
 
@@ -326,7 +339,7 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 	private void addVersionToJira(String swVersion) {
 		String bodyString = "{\"name\":\"" + swVersion + "\"," + "\"project\":\"" + PROJECT_NAME + "\","
 				+ "\"released\": false}";
-		String url = "http://" + jiraServer + ":8080/rest/api/2/version/";
+		String url = basicUrl + "rest/api/2/version";
 
 		makeRestPostRequest(bodyString, url);
 	}
@@ -436,7 +449,7 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 					+ "\": \"" + link + "\"," + "\"customfield_" + startTimeId + "\": \"" + startTime + "\","
 					+ "\"customfield_" + enodebNameId + "\":  [ " + enbNamesString + "]}}";
 
-			String url = "http://" + jiraServer + ":8080/rest/api/2/issue/";
+			String url = basicUrl + "/rest/api/2/issue/";
 
 			responseText = makeRestPostRequest(bodyString, url);
 
@@ -447,11 +460,12 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 
 				if (m.find()) {
 					String issueKey = m.group(1);
-					/*log.info("test issue " + summary + " created successfully with key" + issueKey);
-					if (!linkIssue(issueKey, testKey)) {
-						log.warn("Failed linked test " + issueKey);
-						return false;
-					}*/
+					/*
+					 * log.info("test issue " + summary +
+					 * " created successfully with key" + issueKey); if
+					 * (!linkIssue(issueKey, testKey)) { log.warn(
+					 * "Failed linked test " + issueKey); return false; }
+					 */
 					if (!addTestToExecution(executionKey, issueKey, result)) {
 						log.warn("Failed Adding test " + issueKey);
 						return false;
@@ -473,7 +487,7 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 	private boolean addTestToExecution(String executionKey, String issueKey, String result) {
 		log.info("addTestToExecution: " + executionKey + ", " + issueKey);
 		String bodyString = "{\"add\": [\"" + issueKey + "\"]}";
-		String url = "http://" + jiraServer + ":8080/rest/raven/1.0/api/testexec/" + executionKey + "/test";
+		String url = basicUrl + "rest/raven/1.0/api/testexec/" + executionKey + "/test";
 
 		String ans = makeRestPostRequest(bodyString, url);
 
@@ -492,8 +506,7 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 			return false;
 		}
 		result = translateResult(result);
-		String url = "http://" + jiraServer + ":8080/rest/raven/1.0/api/testrun/" + runId + "/status?status="
-				+ result;
+		String url = basicUrl + "rest/raven/1.0/api/testrun/" + runId + "/status?status=" + result;
 
 		String ans = makeRestPutRequest(url);
 
@@ -515,8 +528,8 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 
 	private int getTestRunId(String executionKey, String issueKey) {
 		log.info("getTestRunId: " + issueKey + ", " + executionKey);
-		String url = "http://" + jiraServer + ":8080/rest/raven/1.0/api/testrun?testExecIssueKey=" + executionKey
-				+ "&testIssueKey=" + issueKey;
+		String url = basicUrl + "rest/raven/1.0/api/testrun?testExecIssueKey=" + executionKey + "&testIssueKey="
+				+ issueKey;
 
 		String ans = makeRestGetRequest(url);
 
@@ -529,30 +542,31 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 		return testRunId;
 	}
 
-	/*private boolean linkIssue(String issueKey, String testKey) {
-		log.info("linkIssue: " + issueKey + ", " + testKey);
-
-		String bodyString = "{\"type\": {\"name\": \"Execute\"}," + "\"inwardIssue\": {\"key\": \"" + testKey + "\"},"
-				+ "\"outwardIssue\": {\"key\": \"" + issueKey + "\"}}";
-
-		String url = "http://" + jiraServer + ":8080/rest/api/2/issueLink";
-
-		String ans = makeRestPostRequest(bodyString, url);
-
-		return !ans.equals("-999");
-	}
-
-	private String checkTestKeyIssueExists(ElasticsearchTest test) {
-		String ans = "SAR-20";
-		
-		  String testName = test.getName(); if (testName.contains("Software"))
-		  { ans = "SWIT-17"; } if (testName.contains("1024")) { ans =
-		  "SWIT-19"; } if (testName.contains("1400")) { ans = "SWIT-18"; } if
-		  (testName.contains("Multiple")) { ans = "SWIT-22"; }
-		 
-
-		return ans;
-	}*/
+	/*
+	 * private boolean linkIssue(String issueKey, String testKey) { log.info(
+	 * "linkIssue: " + issueKey + ", " + testKey);
+	 * 
+	 * String bodyString = "{\"type\": {\"name\": \"Execute\"}," +
+	 * "\"inwardIssue\": {\"key\": \"" + testKey + "\"}," +
+	 * "\"outwardIssue\": {\"key\": \"" + issueKey + "\"}}";
+	 * 
+	 * String url =rest/api/2/issueLink";
+	 * 
+	 * String ans = makeRestPostRequest(bodyString, url);
+	 * 
+	 * return !ans.equals("-999"); }
+	 * 
+	 * private String checkTestKeyIssueExists(ElasticsearchTest test) { String
+	 * ans = "SAR-20";
+	 * 
+	 * String testName = test.getName(); if (testName.contains("Software")) {
+	 * ans = "SWIT-17"; } if (testName.contains("1024")) { ans = "SWIT-19"; } if
+	 * (testName.contains("1400")) { ans = "SWIT-18"; } if
+	 * (testName.contains("Multiple")) { ans = "SWIT-22"; }
+	 * 
+	 * 
+	 * return ans; }
+	 */
 
 	private String makeRestPostRequest(String bodyString, String url) {
 		log.debug("Jira res request:");
@@ -561,25 +575,25 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 		int attempt = 1;
 		String responseText = "";
 		ResponseBody respBody = null;
-		while(attempt < 4){
-			OkHttpClient client = new OkHttpClient();
+		while (attempt < 4) {
+			OkHttpClient client = new OkHttpClient(); // getHttpClient(url);
 			boolean result = false;
 			MediaType mediaType = MediaType.parse("application/json");
 			RequestBody body = RequestBody.create(mediaType, bodyString);
 			Request request = new Request.Builder().url(url).post(body).addHeader("content-type", "application/json")
-					.addHeader("authorization", "Basic c3dpdF9hdXRvOnN3aXRfYXV0bw==").addHeader("cache-control", "no-cache")
+					.addHeader("authorization", "Basic c3dpdF9hdXRvOnN3aXRfYXV0bw==")
+					.addHeader("cache-control", "no-cache")
 					.addHeader("postman-token", "af565a4f-150d-3871-831a-901a360e68a5").build();
 			try {
 				Response response = client.newCall(request).execute();
 				result = response.isSuccessful();
-				if(result){
+				if (result) {
 					respBody = response.body();
 					responseText = respBody.string().replace("\n", "");
 					log.debug("responseText: " + responseText);
 					respBody.close();
 					break;
-				}
-				else{
+				} else {
 					log.info("Post request faild in the " + attempt + " attempt.");
 					responseText = "-999";
 					attempt++;
@@ -588,7 +602,7 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 			} catch (IOException e) {
 				e.printStackTrace();
 				try {
-					if(respBody != null)
+					if (respBody != null)
 						respBody.close();
 					log.info("Post request faild in the " + attempt + " attempt.");
 					responseText = "-999";
@@ -598,6 +612,10 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 					e1.printStackTrace();
 				}
 				continue;
+			}
+			finally {
+				if (respBody != null)
+					respBody.close();
 			}
 		}
 		return responseText;
@@ -657,6 +675,22 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 		return responseText;
 	}
 
+	private boolean updateUrl() {
+		String url = basicUrl + "rest/api/2/issue/createmeta";
+		String res = makeRestGetRequest(url);
+		if (res == "-999") {
+			log.info("URL \"" + url + "\" is not responding.\nTrying https");
+			basicUrl = "https://" + jiraServer + "/";
+			url = basicUrl + "rest/api/2/issue/createmeta";
+			res = makeRestGetRequest(url);
+			if (res == "-999") {
+				log.info("URL \"" + url + "\" is not responding as well.\nStoping report");
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private String millis2time(long durationInMillis) {
 		long second = (durationInMillis / 1000) % 60;
 		long minute = (durationInMillis / (1000 * 60)) % 60;
@@ -664,5 +698,37 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 
 		String time = String.format("%02d:%02d:%02d", hour, minute, second);
 		return time;
+	}
+
+	private OkHttpClient getHttpClient(String url) {
+		if (url.contains("https")) {
+			SSLContext sslContext;
+			TrustManager[] trustManagers;
+			try {
+				KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+				keyStore.load(null, null);
+				InputStream certInputStream = new FileInputStream("/home/difido/plugin/cert.pem");
+				BufferedInputStream bis = new BufferedInputStream(certInputStream);
+				CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+				while (bis.available() > 0) {
+					Certificate cert = certificateFactory.generateCertificate(bis);
+					keyStore.setCertificateEntry("https://helpdesk.airspan.com", cert);
+				}
+				TrustManagerFactory trustManagerFactory = TrustManagerFactory
+						.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+				trustManagerFactory.init(keyStore);
+				trustManagers = trustManagerFactory.getTrustManagers();
+				sslContext = SSLContext.getInstance("TLS");
+				sslContext.init(null, trustManagers, null);
+			} catch (Exception e) {
+				e.printStackTrace(); // TODO replace with real exception handling tailored to your needs
+				return null;
+			}
+
+			OkHttpClient client = new OkHttpClient.Builder()
+					.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustManagers[0]).build();
+			return client;
+		} else
+			return new OkHttpClient();
 	}
 }
