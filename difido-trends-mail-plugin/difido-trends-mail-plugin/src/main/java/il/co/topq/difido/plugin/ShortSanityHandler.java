@@ -106,19 +106,25 @@ public class ShortSanityHandler {
 			return true;
 		}
 		Map<String, String> lineExpressionKeys = ExecutionUtils.getAllLineExpressionKeys(logCounter);
-		
+		int countUnexpected = 0;
 		if (!lineExpressionKeys.isEmpty()) {			
 			Map<String, Map<String, Map<String, String>>> allMaps = ExecutionUtils.getLineExpressionMapBySeverity(lineExpressionKeys); 
 			for(String key1 : allMaps.keySet()) {
 				for(String key2 : allMaps.get(key1).keySet()) {
 					if(key2.contains(UNEXPECTED_REBOOTS)) {
-						log.info("there are unexpected reboots, not making full sanity flag.");
-						return false;
+						Map<String, String> enbs = allMaps.get(key1).get(key2);
+						for(String key3 : enbs.keySet()){
+							countUnexpected += Integer.parseInt(enbs.get(key3));
+						}
+						if(countUnexpected > 3){							
+							log.info("there are " + countUnexpected + " unexpected reboots, not making full sanity flag.");
+							return false;
+						}
 					}
 				}
 			}
 		}
-		log.info("there are no unexpected reboots, condition OK.");
+		log.info("There are less then 4 unexpected reboots, condition OK.");
 		return true;
 	}
 	
