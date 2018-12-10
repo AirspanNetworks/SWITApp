@@ -362,9 +362,9 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 
 	private String getComponent(String scenarioName, String mailingList) {
 		log.info("scenarioName: " + scenarioName + ", mailingList: " + mailingList);
-		if (mailingList.toLowerCase().contains("debug") || mailingList.equals(""))
+		if (mailingList == null || mailingList.toLowerCase().contains("debug") || mailingList.equals(""))
 			return "Debug";
-		if (scenarioName.toLowerCase().contains("regression")) {
+		if (scenarioName.toLowerCase().contains("reg")) {
 			if (scenarioName.toLowerCase().contains("p0")) {
 				return "Regression P0";
 			} else if (scenarioName.toLowerCase().contains("p1")) {
@@ -446,8 +446,8 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 					+ summary + "\",\"issuetype\": {\"id\": \"" + issueTypeId + "\"}," + "\"customfield_" + testTypeId
 					+ "\": { \"value\": \"Automation\" }," + "\"customfield_" + reasonId + "\": \"" + reason + "\","
 					+ "\"customfield_" + durationId + "\": \"" + duration + "\" ," + "\"customfield_" + testLinkId
-					+ "\": \"" + link + "\"," + "\"customfield_" + startTimeId + "\": \"" + startTime + "\","
-					+ "\"customfield_" + enodebNameId + "\":  [ " + enbNamesString + "]}}";
+					+ "\": \"" + link + "\"," + /*"\"customfield_" + startTimeId + "\": \"" + startTime + "\","
+					+ */"\"customfield_" + enodebNameId + "\":  [ " + enbNamesString + "]}}";
 
 			String url = basicUrl + "/rest/api/2/issue/";
 
