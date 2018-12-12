@@ -573,6 +573,10 @@ public class ExecutionUtils {
 			log.info("Execution " + metadata.getId() + " Reported as Fail");
 			status = "Fail";
 		}
+		if(!status.equals("Fail") && MailBodyUtils.getTestsTable(tests).contains("Failure")){
+			log.info("Execution " + metadata.getId() + " Reported as Fail, Since at list one tests failed");
+			status = "Fail";			
+		}
 		return status;
 	}
 }

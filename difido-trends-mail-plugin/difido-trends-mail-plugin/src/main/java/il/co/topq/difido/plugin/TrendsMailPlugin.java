@@ -240,7 +240,6 @@ public class TrendsMailPlugin extends DefaultMailPlugin {
 		final String executionType = scenarioProperties.get(EXECUTION_TYPE);
 		final String targetVersion = scenarioProperties.get(TARGET_VERSION);
 		
-		
 		List<ElasticsearchTest> sortedTests = ExecutionUtils.getAllTestsOfExecutionSortedById(allTests, executionId);
 		ExecutionStatus currentExecutionStatus = ExecutionStatus.caluculateExecutionStatuses(allTests, executionId,
 				executionType, targetVersion);
