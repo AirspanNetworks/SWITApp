@@ -575,6 +575,7 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 		int attempt = 1;
 		String responseText = "";
 		ResponseBody respBody = null;
+		Response response = null;
 		while (attempt < 4) {
 			OkHttpClient client = new OkHttpClient(); // getHttpClient(url);
 			boolean result = false;
@@ -585,7 +586,7 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 					.addHeader("cache-control", "no-cache")
 					.addHeader("postman-token", "af565a4f-150d-3871-831a-901a360e68a5").build();
 			try {
-				Response response = client.newCall(request).execute();
+				response = client.newCall(request).execute();
 				result = response.isSuccessful();
 				if (result) {
 					respBody = response.body();
@@ -602,8 +603,10 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 			} catch (IOException e) {
 				e.printStackTrace();
 				try {
-					if (respBody != null)
+					if (respBody != null){
+						response.close(); 
 						respBody.close();
+					}
 					log.info("Post request faild in the " + attempt + " attempt.");
 					responseText = "-999";
 					attempt++;
@@ -614,8 +617,10 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 				continue;
 			}
 			finally {
-				if (respBody != null)
+				if (respBody != null){
+					response.close(); 
 					respBody.close();
+				}
 			}
 		}
 		return responseText;
