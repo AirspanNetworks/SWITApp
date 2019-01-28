@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import il.co.topq.report.business.elastic.ElasticsearchTest;
 import il.co.topq.report.business.execution.ExecutionMetadata;
+import il.co.topq.report.plugins.InteractivePlugin;
 import il.co.topq.report.plugins.mail.DefaultMailPlugin;
 
 /**
@@ -15,7 +16,7 @@ import il.co.topq.report.plugins.mail.DefaultMailPlugin;
  * @author Itai Agmon
  *
  */
-public class TrendsMailPlugin extends DefaultMailPlugin {
+public class TrendsMailPlugin extends DefaultMailPlugin implements InteractivePlugin {
 	public static final String EXECUTION_TYPE = "Type";
 	public static final String SCENARIO_NAME = "Scenario";
 	public static final String CUSTOMER = "Customer";
@@ -87,6 +88,12 @@ public class TrendsMailPlugin extends DefaultMailPlugin {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	@Override
+	public String executeInteractively(List<ExecutionMetadata> metaDataList, String params) {
+		execute(metaDataList, params);
+		return "<p>Success</p>";
 	}
 
 	@Override

@@ -30,6 +30,7 @@ import com.jayway.jsonpath.JsonPath;
 import il.co.topq.report.business.elastic.ElasticsearchTest;
 import il.co.topq.report.business.execution.ExecutionMetadata;
 import il.co.topq.report.plugins.ExecutionPlugin;
+import il.co.topq.report.plugins.InteractivePlugin;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -37,7 +38,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public class JiraUpdatePlugin implements ExecutionPlugin {
+public class JiraUpdatePlugin implements ExecutionPlugin, InteractivePlugin {
 
 	public enum IssueTypes {
 		Test("Test"), Test_Execution("Test_Execution"), Sub_Test("Sub_Test"), Sub_Test_Execution("Sub_Test_Execution");
@@ -125,6 +126,12 @@ public class JiraUpdatePlugin implements ExecutionPlugin {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public String executeInteractively(List<ExecutionMetadata> metaDataList, String params) {
+		execute(metaDataList, params);
+		return "<p>Success</p>";
 	}
 
 	@Override
