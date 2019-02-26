@@ -1,4 +1,4 @@
-package il.co.topq.difido.plugin;
+package com.swit;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -38,7 +38,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public class JiraUpdatePlugin implements ExecutionPlugin, InteractivePlugin {
+public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 
 	public enum IssueTypes {
 		Test("Test"), Test_Execution("Test_Execution"), Sub_Test("Sub_Test"), Sub_Test_Execution("Sub_Test_Execution");
@@ -72,7 +72,7 @@ public class JiraUpdatePlugin implements ExecutionPlugin, InteractivePlugin {
 	public static String RELAY_VERSION = "RelayVersions";
 	public static String NETSPAN_VERSION = "NetspanVer";
 
-	private static Logger log = LoggerFactory.getLogger(JiraUpdatePlugin.class);
+	private static Logger log = LoggerFactory.getLogger(JiraPlugin.class);
 
 	private Configuration config = null;
 	private static String jiraServer;
@@ -136,7 +136,7 @@ public class JiraUpdatePlugin implements ExecutionPlugin, InteractivePlugin {
 
 	@Override
 	public String getName() {
-		return "JiraUpdatePlugin";
+		return "JiraPlugin";
 	}
 
 	@Override

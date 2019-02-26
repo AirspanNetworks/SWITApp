@@ -16,6 +16,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.swit.ComparisonResult;
+import com.swit.ExecutionStatus;
+import com.swit.ExecutionUtils;
+import com.swit.FeatureStatus;
+import com.swit.MailBodyUtils;
+import com.swit.Templates;
+
 import il.co.topq.report.business.elastic.ElasticsearchTest;
 
 public class TestTemplates {

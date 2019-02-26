@@ -1,4 +1,8 @@
-package il.co.topq.difido.plugin;
+package com.swit;
+
+import static com.swit.SwitMailPlugin.MAILING_LIST;
+import static com.swit.SwitMailPlugin.SEND_MAIL_FLAG;
+import static com.swit.SwitMailPlugin.SETUP_NAME;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,10 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import il.co.topq.report.business.elastic.ElasticsearchTest;
 import il.co.topq.report.business.execution.ExecutionMetadata;
-
-import static il.co.topq.difido.plugin.TrendsMailPlugin.MAILING_LIST;
-import static il.co.topq.difido.plugin.TrendsMailPlugin.SEND_MAIL_FLAG;
-import static il.co.topq.difido.plugin.TrendsMailPlugin.SETUP_NAME;
 
 public class MailUtils {
 	private static final Logger log = LoggerFactory.getLogger(MailUtils.class);
@@ -68,7 +68,7 @@ public class MailUtils {
 
 	public static void saveMailToVersionFolder(ExecutionMetadata metadata, StringBuilder body, String fileName) {
 
-		String scenario = metadata.getProperties().get(TrendsMailPlugin.SCENARIO_NAME);
+		String scenario = metadata.getProperties().get(SwitMailPlugin.SCENARIO_NAME);
 		if ((null == scenario) || scenario.isEmpty()) {
 			log.error("Execution Scenario of execution with id " + metadata.getId() + " is missing");
 			return;
@@ -81,7 +81,7 @@ public class MailUtils {
 		} else
 			log.info("scenario of execution with id " + metadata.getId() + " is " + scenario);
 
-		String mailingList = metadata.getProperties().get(TrendsMailPlugin.MAILING_LIST);
+		String mailingList = metadata.getProperties().get(SwitMailPlugin.MAILING_LIST);
 		if ((null == mailingList)) {
 			log.error("mailingList of execution with id " + metadata.getId() + " is missing");
 			return;
@@ -93,7 +93,7 @@ public class MailUtils {
 			return;
 		} else
 			log.info("mailingList of execution with id " + metadata.getId() + " is Sanity.");
-		String versionFolder = metadata.getProperties().get(TrendsMailPlugin.VERSION_PATH);
+		String versionFolder = metadata.getProperties().get(SwitMailPlugin.VERSION_PATH);
 		if ((null == versionFolder)) {
 			log.error("versionFolder of execution with id " + metadata.getId() + " is missing");
 			return;

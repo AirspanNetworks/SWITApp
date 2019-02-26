@@ -6,6 +6,8 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.swit.TestUtils;
+
 import il.co.topq.report.business.elastic.ElasticsearchTest;
 
 public class TestComparionTests {

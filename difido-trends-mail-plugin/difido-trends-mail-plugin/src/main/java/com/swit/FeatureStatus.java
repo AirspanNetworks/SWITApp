@@ -1,4 +1,4 @@
-package il.co.topq.difido.plugin;
+package com.swit;
 
 import java.util.List;
 

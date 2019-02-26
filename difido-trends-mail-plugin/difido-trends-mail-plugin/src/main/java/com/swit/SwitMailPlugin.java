@@ -1,4 +1,4 @@
-package il.co.topq.difido.plugin;
+package com.swit;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +16,7 @@ import il.co.topq.report.plugins.mail.DefaultMailPlugin;
  * @author Itai Agmon
  *
  */
-public class TrendsMailPlugin extends DefaultMailPlugin implements InteractivePlugin {
+public class SwitMailPlugin extends DefaultMailPlugin implements InteractivePlugin {
 	public static final String EXECUTION_TYPE = "Type";
 	public static final String SCENARIO_NAME = "Scenario";
 	public static final String CUSTOMER = "Customer";
@@ -48,14 +48,14 @@ public class TrendsMailPlugin extends DefaultMailPlugin implements InteractivePl
 	public static final String IP_VERSION = "IPVersion";
 	
 	public boolean problemCreatingMail = false;
-	private static final Logger log = LoggerFactory.getLogger(TrendsMailPlugin.class);
+	private static final Logger log = LoggerFactory.getLogger(SwitMailPlugin.class);
 	boolean newExecution = true;
 	private String sendToAddress = "";
 	protected String subject = "";
 
 	@Override
 	public String getName() {
-		return "trendsMailPlugin";
+		return "SwitMailPlugin";
 	}
 
 	public void onExecutionEnded(ExecutionMetadata metadata) {

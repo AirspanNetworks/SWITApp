@@ -1,4 +1,12 @@
-package il.co.topq.difido.plugin;
+package com.swit;
+
+import static com.swit.SwitMailPlugin.AUTOMATION_VERSION;
+import static com.swit.SwitMailPlugin.BRANCH;
+import static com.swit.SwitMailPlugin.DESCRIPTION;
+import static com.swit.SwitMailPlugin.SCENARIO_NAME;
+import static com.swit.SwitMailPlugin.SETUP_NAME;
+import static com.swit.SwitMailPlugin.TARGET_VERSION;
+import static com.swit.SwitMailPlugin.VERSION_PATH;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -9,13 +17,6 @@ import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static il.co.topq.difido.plugin.TrendsMailPlugin.AUTOMATION_VERSION;
-import static il.co.topq.difido.plugin.TrendsMailPlugin.BRANCH;
-import static il.co.topq.difido.plugin.TrendsMailPlugin.VERSION_PATH;
-import static il.co.topq.difido.plugin.TrendsMailPlugin.DESCRIPTION;
-import static il.co.topq.difido.plugin.TrendsMailPlugin.SETUP_NAME;
-import static il.co.topq.difido.plugin.TrendsMailPlugin.SCENARIO_NAME;
-import static il.co.topq.difido.plugin.TrendsMailPlugin.TARGET_VERSION;
 
 import il.co.topq.report.business.elastic.ElasticsearchTest;
 import il.co.topq.report.business.execution.ExecutionMetadata;

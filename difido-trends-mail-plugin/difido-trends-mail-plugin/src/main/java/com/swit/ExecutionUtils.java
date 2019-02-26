@@ -1,4 +1,6 @@
-package il.co.topq.difido.plugin;
+package com.swit;
+
+import static com.swit.SwitMailPlugin.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,8 +28,6 @@ import il.co.topq.report.Configuration;
 import il.co.topq.report.Configuration.ConfigProps;
 import il.co.topq.report.business.elastic.ElasticsearchTest;
 import il.co.topq.report.business.execution.ExecutionMetadata;
-
-import static il.co.topq.difido.plugin.TrendsMailPlugin.*;
 
 public class ExecutionUtils {
 	private static final Logger log = LoggerFactory.getLogger(ExecutionUtils.class);

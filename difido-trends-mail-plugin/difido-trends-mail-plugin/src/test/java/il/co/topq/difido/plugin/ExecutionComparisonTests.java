@@ -13,6 +13,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.swit.ComparisonResult;
+import com.swit.TestUtils;
+
 import il.co.topq.difido.model.Enums.Status;
 import il.co.topq.report.business.elastic.ElasticsearchTest;
 

@@ -1,4 +1,6 @@
-package il.co.topq.difido.plugin;
+package com.swit;
+
+import static com.swit.SwitMailPlugin.SCENARIO_NAME;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import com.opencsv.CSVWriter;
 
 import il.co.topq.report.business.elastic.ElasticsearchTest;
-
-import static il.co.topq.difido.plugin.TrendsMailPlugin.SCENARIO_NAME;
 
 public class CSVUtils {
 

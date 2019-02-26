@@ -1,4 +1,4 @@
-package il.co.topq.difido.plugin;
+package com.swit;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,7 +22,7 @@ import il.co.topq.report.business.execution.ExecutionMetadata;
 public class ShortSanityHandler {
 
 	private static final String UNEXPECTED_REBOOTS = "Unexpected Reboots";
-	private static final Logger log = LoggerFactory.getLogger(TrendsMailPlugin.class);
+	private static final Logger log = LoggerFactory.getLogger(SwitMailPlugin.class);
 	private String subject = "";
 	private String scenario;
 	private String slave;
@@ -226,42 +226,42 @@ public class ShortSanityHandler {
 
 	private Boolean getPropertiesValues() {
 		Boolean validProporties = true;
-		scenario = metaData.getProperties().get(TrendsMailPlugin.SCENARIO_NAME);
+		scenario = metaData.getProperties().get(SwitMailPlugin.SCENARIO_NAME);
 		if ((null == scenario) || scenario.isEmpty()) {
 			log.error("Execution Scenario of execution with id " + metaData.getId() + " is missing");
 			validProporties = false;
 		} else {
 			subject += scenario;
 		}
-		slave = metaData.getProperties().get(TrendsMailPlugin.SETUP_NAME);
+		slave = metaData.getProperties().get(SwitMailPlugin.SETUP_NAME);
 		if (null == slave || slave.isEmpty()) {
 			log.error("SetupName of execution with id " + metaData.getId() + " is missing");
 			validProporties = false;
 		} else {
 			subject += "-" + slave;
 		}
-		branch = metaData.getProperties().get(TrendsMailPlugin.BRANCH);
+		branch = metaData.getProperties().get(SwitMailPlugin.BRANCH);
 		if ((null == branch) || branch.isEmpty()) {
 			log.error("Branch of execution with id " + metaData.getId() + " is missing");
 			validProporties = false;
 		} else {
 			subject += "-" + branch;
 		}
-		mailingList = metaData.getProperties().get(TrendsMailPlugin.MAILING_LIST);
+		mailingList = metaData.getProperties().get(SwitMailPlugin.MAILING_LIST);
 		if ((null == mailingList) || mailingList.isEmpty()) {
 			log.error("mailingList of execution with id " + metaData.getId() + " is missing");
 			validProporties = false;
 		} else {
 			subject += "-" + mailingList;
 		}
-		version = metaData.getProperties().get(TrendsMailPlugin.TARGET_VERSION);
+		version = metaData.getProperties().get(SwitMailPlugin.TARGET_VERSION);
 		if ((null == version) || version.isEmpty()) {
 			log.error("targetVersion of execution with id " + metaData.getId() + " is missing");
 			validProporties = false;
 		} else {
 			subject += "-" + version;
 		}
-		versionPath = metaData.getProperties().get(TrendsMailPlugin.VERSION_PATH);
+		versionPath = metaData.getProperties().get(SwitMailPlugin.VERSION_PATH);
 		if ((null == version) || version.isEmpty()) {
 			log.error("targetVersion of execution with id " + metaData.getId() + " is missing");
 			validProporties = false;
