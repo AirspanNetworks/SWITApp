@@ -20,7 +20,7 @@ public class SwitMailPlugin extends DefaultMailPlugin implements InteractivePlug
 	public static final String EXECUTION_TYPE = "Type";
 	public static final String SCENARIO_NAME = "Scenario";
 	public static final String CUSTOMER = "Customer";
-	public static final String AUTOMATION_VERSION = "Version";
+	public static final String AUTOMATION_VERSION = "AutoVersion";
 	public static final String BRANCH = "Branch";
 	public static final String VERSION_PATH = "VersionPath";
 	public static final String SETUP_NAME = "SetupName";
