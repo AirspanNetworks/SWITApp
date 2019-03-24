@@ -60,7 +60,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 	// public static String JIRA_ADDRESS = "192.168.58.250";
 	public static String SCENARIO_NAME = "Scenario";
 	public static String MAILING_LIST = "MailingList";
-	public static String AUTOMATION_VERSION = "Version";
+	public static String AUTOMATION_VERSION = "AutoVersion";
 	public static String SETUP_NAME = "SetupName";
 	public static String TARGET_VERSION = "targetVersion";
 	public static String DURATION = "duration";
