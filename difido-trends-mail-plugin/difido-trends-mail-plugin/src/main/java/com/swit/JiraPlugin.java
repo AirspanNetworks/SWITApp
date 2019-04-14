@@ -309,7 +309,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 		String bodyString = "{\"fields\": { \"project\":{\"id\": \"" + projectId + "\"}," + "\"summary\": \""
 				+ executionName + "\"," + "\"components\": [{\"name\": \"" + component + "\"}]," + "\"customfield_"
 				+ durationId + "\": \"" + duration + "\"," // Duration(units?)
-				+ "\"customfield_" + buildId + "\": \"" + swBuild + "\"," // target_build
+				+ "\"customfield_" + buildId + "\": " + swBuild + "," // target_build
 				+ "\"customfield_" + branchId + "\": [\"" + branch + "\"]," // branch
 				+ "\"customfield_" + automationVersionId + "\": [\"" + automationVersion + "\"]," // automation_version
 				+ "\"customfield_" + enodebTypeId + "\": [ " + enbTypesString + "]," // Dut_types
