@@ -97,7 +97,8 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 
 	private String rawEnbTypeString = null;
 	private String basicUrl = null;
-
+	private boolean finished;
+	
 	public static void main(String[] args) {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date dt = null;
@@ -130,8 +131,9 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 	
 	@Override
 	public String executeInteractively(List<ExecutionMetadata> metaDataList, String params) {
+		finished = true;
 		execute(metaDataList, params);
-		return "<p>Success</p>";
+		return finished ? "<p>Success</p>" : "<p>Failed :(</p>";
 	}
 
 	@Override
@@ -157,7 +159,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 		}
 		config = Configuration.getInstance(Configuration.JIRA_CONFIG_FILE_NAME);
 		jiraServer = config.readString(JIRA_SERVER_ADDRESS);
-		basicUrl = "http://" + jiraServer + ":8080/";
+		basicUrl = "https://" + jiraServer + ":8080/";
 		if (!updateUrl())
 			return;
 		int executionId = metadata.getId();
@@ -170,13 +172,16 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 			scenarioProperties = ExecutionUtils.getExecutionScenarioProperties(executionId);
 		} catch (Exception e) {
 			log.error("Exception due to: " + e.getMessage());
+			finished = false;
 			return;
 		}
 		log.debug("scenarioProperties:");
 		for (String key : scenarioProperties.keySet()) {
 			log.debug("Key: " + key + ",  value: " + scenarioProperties.get(key));
+			finished = false;
 		}
-		jiraInteraction(sortedTests, scenarioProperties);
+		if (!jiraInteraction(sortedTests, scenarioProperties))
+			finished = false;
 
 	}
 
@@ -589,7 +594,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 			MediaType mediaType = MediaType.parse("application/json");
 			RequestBody body = RequestBody.create(mediaType, bodyString);
 			Request request = new Request.Builder().url(url).post(body).addHeader("content-type", "application/json")
-					.addHeader("authorization", "Basic c3dpdF9hdXRvOnN3aXRfYXV0bw==")
+					.addHeader("authorization", "Basic c3dpdF9hdXRvOlN3aXRfQHV0bzI=")
 					.addHeader("cache-control", "no-cache")
 					.addHeader("postman-token", "af565a4f-150d-3871-831a-901a360e68a5").build();
 			try {
@@ -640,7 +645,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 		String responseText = "";
 		boolean result = false;
 		Request request = new Request.Builder().url(url).get().addHeader("content-type", "application/json")
-				.addHeader("authorization", "Basic c3dpdF9hdXRvOnN3aXRfYXV0bw==").addHeader("cache-control", "no-cache")
+				.addHeader("authorization", "Basic c3dpdF9hdXRvOlN3aXRfQHV0bzI=").addHeader("cache-control", "no-cache")
 				.addHeader("postman-token", "af565a4f-150d-3871-831a-901a360e68a5").build();
 		try {
 			Response response = client.newCall(request).execute();
@@ -668,7 +673,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 		MediaType mediaType = MediaType.parse("application/json");
 		RequestBody body = RequestBody.create(mediaType, "");
 		Request request = new Request.Builder().url(url).put(body).addHeader("content-type", "application/json")
-				.addHeader("authorization", "Basic c3dpdF9hdXRvOnN3aXRfYXV0bw==").addHeader("cache-control", "no-cache")
+				.addHeader("authorization", "Basic c3dpdF9hdXRvOlN3aXRfQHV0bzI=").addHeader("cache-control", "no-cache")
 				.addHeader("postman-token", "af565a4f-150d-3871-831a-901a360e68a5").build();
 		try {
 			Response response = client.newCall(request).execute();
@@ -691,8 +696,8 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 		String url = basicUrl + "rest/api/2/issue/createmeta";
 		String res = makeRestGetRequest(url);
 		if (res == "-999") {
-			log.info("URL \"" + url + "\" is not responding.\nTrying https");
-			basicUrl = "https://" + jiraServer + "/";
+			log.info("URL \"" + url + "\" is not responding.\nTrying http");
+			basicUrl = "http://" + jiraServer + "/";
 			url = basicUrl + "rest/api/2/issue/createmeta";
 			res = makeRestGetRequest(url);
 			if (res == "-999") {
