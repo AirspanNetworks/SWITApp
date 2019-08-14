@@ -159,7 +159,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 		}
 		config = Configuration.getInstance(Configuration.JIRA_CONFIG_FILE_NAME);
 		jiraServer = config.readString(JIRA_SERVER_ADDRESS);
-		basicUrl = "https://" + jiraServer + ":8080/";
+		basicUrl = "https://" + jiraServer + "/";
 		if (!updateUrl())
 			return;
 		int executionId = metadata.getId();
@@ -178,7 +178,6 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 		log.debug("scenarioProperties:");
 		for (String key : scenarioProperties.keySet()) {
 			log.debug("Key: " + key + ",  value: " + scenarioProperties.get(key));
-			finished = false;
 		}
 		if (!jiraInteraction(sortedTests, scenarioProperties))
 			finished = false;
@@ -461,7 +460,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 					+ "\": \"" + link + "\"," + /*"\"customfield_" + startTimeId + "\": \"" + startTime + "\","
 					+ */"\"customfield_" + enodebNameId + "\":  [ " + enbNamesString + "]}}";
 
-			String url = basicUrl + "/rest/api/2/issue/";
+			String url = basicUrl + "rest/api/2/issue/";
 
 			responseText = makeRestPostRequest(bodyString, url);
 
@@ -492,8 +491,9 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 	private boolean addTestToExecution(String executionKey, String issueKey, String result) {
@@ -697,7 +697,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 		String res = makeRestGetRequest(url);
 		if (res == "-999") {
 			log.info("URL \"" + url + "\" is not responding.\nTrying http");
-			basicUrl = "http://" + jiraServer + "/";
+			basicUrl = "http://" + jiraServer + ":8080/";
 			url = basicUrl + "rest/api/2/issue/createmeta";
 			res = makeRestGetRequest(url);
 			if (res == "-999") {
