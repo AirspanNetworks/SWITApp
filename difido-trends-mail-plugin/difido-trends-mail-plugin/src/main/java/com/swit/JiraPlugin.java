@@ -373,21 +373,32 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 
 	private String getComponent(String scenarioName, String mailingList) {
 		log.info("scenarioName: " + scenarioName + ", mailingList: " + mailingList);
-		if (mailingList == null || mailingList.toLowerCase().contains("debug") || mailingList.equals(""))
+		if (mailingList.toLowerCase().contains("debug"))
 			return "Debug";
+		String component = "None";
 		if (scenarioName.toLowerCase().contains("reg")) {
-			if (scenarioName.toLowerCase().contains("p0")) {
-				return "Regression P0";
-			} else if (scenarioName.toLowerCase().contains("p1")) {
-				return "Regression P1";
+			if (scenarioName.toLowerCase().contains("p1")) {
+				component = "Regression P1";
+			} else {
+				component = "Regression P0";
 			}
 		} else if (scenarioName.toLowerCase().contains("sanity"))
-			return "Sanity";
+			component = "Sanity";
 		else if (scenarioName.toLowerCase().contains("stability"))
-			return "Stability";
+			component = "Stability";
 		else if (scenarioName.toLowerCase().contains("smoke"))
-			return "Smoke";
-		return "None";
+			component = "Smoke";
+		else if (scenarioName.toLowerCase().contains("bat"))
+			component = "BAT";
+		else if (scenarioName.toLowerCase().contains("scale"))
+			component = "Scale";
+		else if (scenarioName.toLowerCase().contains("performance"))
+			component = "Performance";
+		else if (scenarioName.toLowerCase().contains("recovery"))
+			component = "Recovery";
+		if (mailingList.toLowerCase().contains("atp"))
+			component += "\"},{\"name\":\"ATP";
+		return component;
 	}
 
 	public boolean createJiraIssue(String executionKey, ElasticsearchTest test) {
