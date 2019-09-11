@@ -396,7 +396,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 			component = "Performance";
 		else if (scenarioName.toLowerCase().contains("recovery"))
 			component = "Recovery";
-		if (mailingList.toLowerCase().contains("atp"))
+		if (mailingList != null && mailingList.toLowerCase().contains("atp") && !component.equals("None"))
 			component += "\"},{\"name\":\"ATP";
 		return component;
 	}
