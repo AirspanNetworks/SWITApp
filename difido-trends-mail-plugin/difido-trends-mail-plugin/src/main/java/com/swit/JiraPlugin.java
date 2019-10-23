@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -107,7 +108,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 			dt = formatter.parse("2017/10/19 08:48:32");
 		} catch (ParseException e1) {
 			log.warn("Failed parsing start time.");
-			e1.printStackTrace();
+			log.info(e1.getMessage());
 		}
 
 		System.out.println("ZoneId: " + TimeZone.getDefault());
@@ -125,7 +126,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 			else
 				log.warn("Wrong password!");
 		} catch (Throwable e) {
-			e.printStackTrace();
+			log.info(e.getMessage());
 		}
 	}
 	
@@ -328,7 +329,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 				+ " \"issuetype\": {\"name\": \"Test Execution\"}}}";
 		String url = basicUrl + "rest/api/2/issue/";
 
-		String responseText = makeRestPostRequest(bodyString, url);
+		String responseText = makeRestPostRequest(bodyString, url, executionName, 3);
 
 		String regex = "\"key\":\"(.+)\",";
 
@@ -352,7 +353,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 				+ "\"released\": false}";
 		String url = basicUrl + "rest/api/2/version";
 
-		makeRestPostRequest(bodyString, url);
+		makeRestPostRequest(bodyString, url, swVersion, 1);
 	}
 
 	private String convertToJiraTime(String startTime) {
@@ -363,7 +364,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 			dt = formatter.parse(startTime);
 		} catch (ParseException e1) {
 			log.warn("Failed parsing start time.");
-			e1.printStackTrace();
+			log.info(e1.getMessage());
 		}
 		SimpleDateFormat formatter1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.0Z");
 		startTime = formatter1.format(dt);
@@ -373,7 +374,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 
 	private String getComponent(String scenarioName, String mailingList) {
 		log.info("scenarioName: " + scenarioName + ", mailingList: " + mailingList);
-		if (mailingList.toLowerCase().contains("debug"))
+		if (mailingList != null && mailingList.toLowerCase().contains("debug"))
 			return "Debug";
 		String component = "None";
 		if (scenarioName.toLowerCase().contains("reg")) {
@@ -473,7 +474,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 
 			String url = basicUrl + "rest/api/2/issue/";
 
-			responseText = makeRestPostRequest(bodyString, url);
+			responseText = makeRestPostRequest(bodyString, url, summary, 3);
 
 			if (!responseText.equals("-999")) {
 				String regex = "\"key\":\"(.+)\",";
@@ -501,7 +502,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 				return true;
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			log.info(e.getMessage());
 			return false;
 		}
 		return true;
@@ -512,7 +513,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 		String bodyString = "{\"add\": [\"" + issueKey + "\"]}";
 		String url = basicUrl + "rest/raven/1.0/api/testexec/" + executionKey + "/test";
 
-		String ans = makeRestPostRequest(bodyString, url);
+		String ans = makeRestPostRequest(bodyString, url, "Add test " + issueKey, 3);
 
 		if (!ans.equals("-999")) {
 			return updateTestRunStatus(executionKey, issueKey, result);
@@ -591,7 +592,7 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 	 * return ans; }
 	 */
 
-	private String makeRestPostRequest(String bodyString, String url) {
+	private String makeRestPostRequest(String bodyString, String url, String name, int numOfRetries) {
 		log.debug("Jira res request:");
 		log.debug("URL: " + url);
 		log.debug("body: " + bodyString);
@@ -599,8 +600,13 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 		String responseText = "";
 		ResponseBody respBody = null;
 		Response response = null;
-		while (attempt < 4) {
-			OkHttpClient client = new OkHttpClient(); // getHttpClient(url);
+		while (attempt <= numOfRetries) {
+			OkHttpClient client = new OkHttpClient()
+					.newBuilder()
+					.connectTimeout(20, TimeUnit.SECONDS)
+					.writeTimeout(20, TimeUnit.SECONDS)
+					.readTimeout(20, TimeUnit.SECONDS)
+					.build();
 			boolean result = false;
 			MediaType mediaType = MediaType.parse("application/json");
 			RequestBody body = RequestBody.create(mediaType, bodyString);
@@ -614,34 +620,36 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 				if (result) {
 					respBody = response.body();
 					responseText = respBody.string().replace("\n", "");
-					log.debug("responseText: " + responseText);
-					respBody.close();
 					break;
 				} else {
-					log.info("Post request faild in the " + attempt + " attempt.");
-					responseText = "-999";
+					log.info(name + " - Post request faild in the " + attempt + " attempt.");
 					attempt++;
+					if(response != null){
+						log.info("responseCode: " + response.code());
+						if(response.code() == 400 || response.code() == 401){
+							log.info("url is " + url);
+							log.info("bodyString is " + bodyString);
+						}
+					}
+					responseText = "-999";
 					continue;
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.info(name + " Exception occured");
+				log.info(e.getMessage());
 				try {
-					if (respBody != null){
-						response.close(); 
-						respBody.close();
-					}
-					log.info("Post request faild in the " + attempt + " attempt.");
-					responseText = "-999";
+					log.info(name + " - Post request faild in the " + attempt + " attempt.");
 					attempt++;
+					responseText = "-999";
 					Thread.sleep(5000);
 				} catch (Exception e1) {
-					e1.printStackTrace();
+					log.info(e1.getMessage());
 				}
 				continue;
 			}
 			finally {
 				if (respBody != null){
-					response.close(); 
+					log.info(name + " response body closed");
 					respBody.close();
 				}
 			}
@@ -652,21 +660,32 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 	private String makeRestGetRequest(String url) {
 		log.debug("Jira res request:");
 		log.debug("URL: " + url);
-		OkHttpClient client = new OkHttpClient();
+		OkHttpClient client = new OkHttpClient()
+				.newBuilder()
+				.connectTimeout(20, TimeUnit.SECONDS)
+				.writeTimeout(20, TimeUnit.SECONDS)
+				.readTimeout(20, TimeUnit.SECONDS)
+				.build();
 		String responseText = "";
 		boolean result = false;
+		ResponseBody respBody = null;
 		Request request = new Request.Builder().url(url).get().addHeader("content-type", "application/json")
 				.addHeader("authorization", "Basic c3dpdF9hdXRvOlN3aXRfQHV0bzI=").addHeader("cache-control", "no-cache")
 				.addHeader("postman-token", "af565a4f-150d-3871-831a-901a360e68a5").build();
 		try {
 			Response response = client.newCall(request).execute();
 			result = response.isSuccessful();
-			ResponseBody respBody = response.body();
+			respBody = response.body();
 			responseText = respBody.string().replace("\n", "");
 			log.debug("responseText: " + responseText);
 			respBody.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.info(e.getMessage());
+		}
+		finally {
+			if (respBody != null){
+				respBody.close();
+			}
 		}
 
 		if (!result) {
@@ -678,8 +697,14 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 	private String makeRestPutRequest(String url) {
 		log.debug("Jira res request:");
 		log.debug("URL: " + url);
-		OkHttpClient client = new OkHttpClient();
+		OkHttpClient client = new OkHttpClient()
+				.newBuilder()
+				.connectTimeout(10, TimeUnit.SECONDS)
+				.writeTimeout(10, TimeUnit.SECONDS)
+				.readTimeout(10, TimeUnit.SECONDS)
+				.build();
 		String responseText = "";
+		ResponseBody respBody = null;
 		boolean result = false;
 		MediaType mediaType = MediaType.parse("application/json");
 		RequestBody body = RequestBody.create(mediaType, "");
@@ -689,12 +714,17 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 		try {
 			Response response = client.newCall(request).execute();
 			result = response.isSuccessful();
-			ResponseBody respBody = response.body();
+			respBody = response.body();
 			responseText = respBody.string().replace("\n", "");
 			log.debug("responseText: " + responseText);
 			respBody.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.info(e.getMessage());
+		}
+		finally {
+			if (respBody != null){
+				respBody.close();
+			}
 		}
 
 		if (!result) {
@@ -726,37 +756,5 @@ public class JiraPlugin implements ExecutionPlugin, InteractivePlugin {
 
 		String time = String.format("%02d:%02d:%02d", hour, minute, second);
 		return time;
-	}
-
-	private OkHttpClient getHttpClient(String url) {
-		if (url.contains("https")) {
-			SSLContext sslContext;
-			TrustManager[] trustManagers;
-			try {
-				KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-				keyStore.load(null, null);
-				InputStream certInputStream = new FileInputStream("/home/difido/plugin/cert.pem");
-				BufferedInputStream bis = new BufferedInputStream(certInputStream);
-				CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-				while (bis.available() > 0) {
-					Certificate cert = certificateFactory.generateCertificate(bis);
-					keyStore.setCertificateEntry("https://helpdesk.airspan.com", cert);
-				}
-				TrustManagerFactory trustManagerFactory = TrustManagerFactory
-						.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-				trustManagerFactory.init(keyStore);
-				trustManagers = trustManagerFactory.getTrustManagers();
-				sslContext = SSLContext.getInstance("TLS");
-				sslContext.init(null, trustManagers, null);
-			} catch (Exception e) {
-				e.printStackTrace(); // TODO replace with real exception handling tailored to your needs
-				return null;
-			}
-
-			OkHttpClient client = new OkHttpClient.Builder()
-					.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustManagers[0]).build();
-			return client;
-		} else
-			return new OkHttpClient();
 	}
 }

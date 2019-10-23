@@ -49,10 +49,10 @@ public class ShortSanityHandler {
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		if (!checkAllTestsPerformed()) {
+		/*if (!checkAllTestsPerformed()) {
 			log.error("Not all tests were performed.");
 			return;
-		}
+		}*/
 
 		if (!getPropertiesValues()) {
 			log.error("Properties are not valid.");
